@@ -1,0 +1,16 @@
+{
+  "version": 3,
+  "github": {
+    "enabled": true,
+    "silent": false
+  },
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}

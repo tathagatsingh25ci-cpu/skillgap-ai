@@ -59,6 +59,10 @@ This project is ready for deployment on Vercel.
 - Set environment variables in the Vercel dashboard.
 - Deploy the app.
 
+## Repository
+
+- GitHub: https://github.com/tathagatsingh25ci-cpu/skillgap-ai
+
 ## Folder structure
 
 - `app/` — Next.js App Router pages and API routes
