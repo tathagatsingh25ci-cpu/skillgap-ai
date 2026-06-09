@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionTier {
+  FREE
+  PRO
+  PREMIUM
+}
+
+enum CareerDomain {
+  SOFTWARE
+  AI
+  DATA
+  CYBERSECURITY
+  ELECTRONICS
+  NETWORKING
+  DESIGN
+  MANAGEMENT
+}
+
+model User {
+  id             String             @id @default(cuid())
+  clerkId        String             @unique
+  email          String             @unique
+  name           String?
+  profile        Profile?
+  resume         Resume?
+  githubAnalysis GitHubAnalysis?
+  analyses       Analysis[]
+  roadmap        Roadmap?
+  subscription   Subscription?
+  mentorChats    MentorChat[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+}
+
+model Profile {
+  id             String       @id @default(cuid())
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String       @unique
+  headline       String?
+  careerGoal     String?
+  portfolioUrl   String?
+  linkedInUrl    String?
+  githubUsername String?
+  skills         String[]     @default([])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Resume {
+  id            String    @id @default(cuid())
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String    @unique
+  filename      String
+  fileType      String
+  atsScore      Int       @default(0)
+  formatting    String?
+  keywords      String?
+  suggestions   String?
+  uploadedAt    DateTime  @default(now())
+}
+
+model GitHubAnalysis {
+  id                String    @id @default(cuid())
+  user              User      @relation(fields: [userId], references: [id])
+  userId            String    @unique
+  score             Int       @default(0)
+  topLanguages      String[]   @default([])
+  repoCount         Int       @default(0)
+  readmeQuality     String?
+  commitConsistency String?
+  lastSynced        DateTime  @default(now())
+}
+
+model Analysis {
+  id             String        @id @default(cuid())
+  user           User          @relation(fields: [userId], references: [id])
+  userId         String
+  title          String
+  summary        String
+  missingSkills  String[]      @default([])
+  prioritySkills String[]      @default([])
+  createdAt      DateTime      @default(now())
+}
+
+model Roadmap {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @unique
+  plan30      String
+  plan90      String
+  plan180     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProjectRecommendation {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  level       String
+  projects    String[] @default([])
+  generatedAt DateTime @default(now())
+}
+
+model Subscription {
+  id            String           @id @default(cuid())
+  user          User             @relation(fields: [userId], references: [id])
+  userId        String           @unique
+  tier          SubscriptionTier @default(FREE)
+  stripeId      String?
+  status        String           @default("active")
+  currentPeriodEnd DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model Payment {
+  id           String    @id @default(cuid())
+  user         User      @relation(fields: [userId], references: [id])
+  userId       String
+  stripePaymentId String
+  amount       Int
+  currency     String     @default("usd")
+  status       String
+  createdAt    DateTime   @default(now())
+}
+
+model CareerPath {
+  id          String    @id @default(cuid())
+  domain      CareerDomain
+  title       String
+  description String
+}
+
+model SkillScore {
+  id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String   @unique
+  technical     Int      @default(0)
+  project       Int      @default(0)
+  resume        Int      @default(0)
+  interview     Int      @default(0)
+  readiness     Int      @default(0)
+  updatedAt     DateTime @default(now())
+}
+
+model JobMatch {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  jobTitle     String
+  matchPercent Int
+  missingItems String[] @default([])
+  createdAt    DateTime @default(now())
+}
+
+model MentorChat {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  question  String
+  response  String
+  createdAt DateTime @default(now())
+}
